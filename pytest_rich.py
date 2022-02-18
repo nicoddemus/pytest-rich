@@ -6,7 +6,6 @@ import warnings
 from pathlib import Path
 from typing import Dict
 from typing import List
-from typing import Literal
 from typing import Optional
 from typing import Sequence
 from typing import Tuple
@@ -25,6 +24,11 @@ from rich.progress import Progress
 from rich.progress import SpinnerColumn
 from rich.progress import TaskID
 from rich.rule import Rule
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 
 def pytest_addoption(parser):
