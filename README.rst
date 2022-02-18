@@ -24,7 +24,7 @@ The plugin currently outputs this:
 .. image:: assets/screenshot.png
     :align: center
 
-There's definitely room for improvement, and the new maintainer is free to improve on that or even change it completely.
+There's definitely room for improvement, and the new maintainers are free to improve on that or even change it completely.
 
 I intend to *initially* add people as maintainers to this repository, and after a while eventually transfer it to another account.
 
