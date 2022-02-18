@@ -23,7 +23,7 @@ setup(
     description="Leverage rich for richer test session output",
     long_description=read("README.rst"),
     py_modules=["pytest_rich"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=["pytest>=7.0", "rich", "typing_extensions; python_version<'3.8'"],
     classifiers=[
         "Development Status :: 4 - Beta",
