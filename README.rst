@@ -17,7 +17,7 @@ This plugin is not published to PyPI yet.
 IMPORTANT: Proof-of-concept
 ---------------------------
 
-This plugin is mostly a prove of concept and is **looking for a maintainer** which wants to adopt it.
+This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it.
 
 The plugin currently outputs this:
 
