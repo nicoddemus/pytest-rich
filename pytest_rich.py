@@ -296,9 +296,9 @@ class RichExceptionChainRepr:
             inherit=False,
         )
 
-        repr_highlighter = ReprHighlighter()
+        ReprHighlighter()
         stack_renderable: ConsoleRenderable = Panel(
-            self._render_chain(self.chain),
+            self._render_chain(self.chain, options),
             title="[traceback.title]Traceback [dim](most recent call last)",
             style=background_style,
             border_style="traceback.border",
@@ -311,10 +311,7 @@ class RichExceptionChainRepr:
         for entry in self.chain.reprtraceback.reprentries:
             if entry.reprfileloc.message:
                 yield Text.assemble(
-                    (f"{entry.reprfileloc.message}: ", "traceback.exc_type"),
-                    repr_highlighter(
-                        self._grab_err_msg(entry.reprfileloc.message, entry.lines)
-                    ),
+                    (f"{entry.reprfileloc.message}", "traceback.exc_type"),
                 )
                 yield ""
 
@@ -324,8 +321,11 @@ class RichExceptionChainRepr:
                 return line.split(f"{message}: ")[1]
 
     @group()
-    def _render_chain(self, chain: ExceptionChainRepr) -> RenderResult:
+    def _render_chain(
+        self, chain: ExceptionChainRepr, options: ConsoleOptions
+    ) -> RenderResult:
         path_highlighter = PathHighlighter()
+        repr_highlighter = ReprHighlighter()
         theme = self.theme
         code_cache: Dict[str, str] = {}
 
@@ -383,10 +383,23 @@ class RichExceptionChainRepr:
                     args.append(Text(", "))
             return args
 
+        def get_error_source(lines: List[str]) -> str:
+            for line in lines:
+                if line.startswith(">"):
+                    return line.split(">")[1].strip()
+
+        def get_err_msgs(lines: List[str]) -> str:
+            err_lines = []
+            for line in lines:
+                if line.startswith("E"):
+                    err_lines.append(line[1:].strip())
+            return err_lines
+
         for last, entry in loop_last(chain.reprtraceback.reprentries):
             filename = entry.reprfileloc.path
             lineno = entry.reprfileloc.lineno
             funcname = guess_funcname(lineno, filename)
+            message = entry.reprfileloc.message
 
             text = Text.assemble(
                 path_highlighter(Text(filename, style="pygments.string")),
@@ -420,6 +433,24 @@ class RichExceptionChainRepr:
             )
             yield ""
             yield syntax
+
+            if message:
+                line_pointer = "> " if options.legacy_windows else "❱ "
+                yield ""
+                yield Text.assemble(
+                    (str(lineno), "pygments.number"),
+                    ": ",
+                    (message, "traceback.exc_type"),
+                )
+                yield Text.assemble(
+                    (line_pointer, Style(color="red")),
+                    repr_highlighter(get_error_source(entry.lines)),
+                )
+                for err_msg in get_err_msgs(entry.lines):
+                    yield Text.assemble(
+                        ("E ", Style(color="red")),
+                        repr_highlighter(err_msg),
+                    )
 
             if not last:
                 yield ""
