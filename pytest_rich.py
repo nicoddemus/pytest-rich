@@ -235,10 +235,11 @@ class RichTerminalReporter:
             self.runtest_progress.stop()
             self.runtest_progress = None
             self.runtest_tasks_per_file.clear()
-        for nodeid, report in self.failed_reports.items():
-            self.console.print(Rule(f"[magenta]{nodeid}[/magenta]", style="red"))
-            tb = RichExceptionChainRepr(report.longrepr)
-            self.console.print(tb)
+        if self.failed_reports:
+            self.console.print(Rule("FAILURES", style="red"))
+            for nodeid, report in self.failed_reports.items():
+                tb = RichExceptionChainRepr(nodeid, report.longrepr)
+                self.console.print(tb)
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
@@ -258,6 +259,7 @@ class RichExceptionChainRepr:
     object, which Rich's `Traceback` class requires.
     """
 
+    nodeid: str
     chain: ExceptionChainRepr
     extra_lines: int = 3
     theme: Optional[str] = "ansi_dark"
@@ -296,10 +298,9 @@ class RichExceptionChainRepr:
             inherit=False,
         )
 
-        ReprHighlighter()
         stack_renderable: ConsoleRenderable = Panel(
             self._render_chain(self.chain, options),
-            title="[traceback.title]Traceback [dim](most recent call last)",
+            title=f"[magenta]{self.nodeid}[/magenta]",
             style=background_style,
             border_style="traceback.border",
             expand=True,
@@ -308,10 +309,18 @@ class RichExceptionChainRepr:
         with console.use_theme(traceback_theme):
             yield stack_renderable
 
+        path_highlighter = PathHighlighter()
         for entry in self.chain.reprtraceback.reprentries:
             if entry.reprfileloc.message:
                 yield Text.assemble(
-                    (f"{entry.reprfileloc.message}", "traceback.exc_type"),
+                    path_highlighter(
+                        Text(entry.reprfileloc.path, style="pygments.string")
+                    ),
+                    (":", "pygments.text"),
+                    (str(entry.reprfileloc.lineno), "pygments.number"),
+                    (": ", "pygments.text"),
+                    Text(entry.reprfileloc.message, style="pygments.string"),
+                    style="pygments.text",
                 )
                 yield ""
 
