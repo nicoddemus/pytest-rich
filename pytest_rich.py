@@ -315,11 +315,6 @@ class RichExceptionChainRepr:
                 )
                 yield ""
 
-    def _grab_err_msg(self, message: str, lines: List[str]) -> str:
-        for line in lines:
-            if f"{message}: " in line:
-                return line.split(f"{message}: ")[1]
-
     @group()
     def _render_chain(
         self, chain: ExceptionChainRepr, options: ConsoleOptions
