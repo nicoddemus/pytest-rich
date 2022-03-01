@@ -128,6 +128,9 @@ class RichTerminalReporter:
                 f"python [cyan]{py_version}",
             ]
         )
+        if getattr(sys, "pypy_version_info", None):
+            pypy_verinfo = ".".join(map(str, sys.pypy_version_info[:3]))
+            column1.add_renderable(f"pypy [cyan]{pypy_verinfo}")
         column2 = Columns([f"root [cyan][bold]{session.config.rootpath}"])
         self.console.print(
             Panel(Group(column1, column2), title=f"pytest session starts")
