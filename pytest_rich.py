@@ -1,6 +1,7 @@
 """
 Proof of concept for pytest + rich integration.
 """
+import ast
 import sys
 import warnings
 from pathlib import Path
@@ -352,9 +353,10 @@ class RichExceptionChainRepr:
                 code_cache[filename] = code
             return code
 
-        def guess_funcname(lineno: int, filename: str) -> str:
+        def get_funcname(lineno: int, filename: str) -> str:
             """
-            Get the nearest function name
+            Given a line number in a file, using `ast.parse` walk backwards
+            until we find the function name.
 
             Args:
                 lineno (int): Line number to start searching from
@@ -364,14 +366,17 @@ class RichExceptionChainRepr:
                 str: Function name
             """
             code = read_code(filename)
-            lines = code.splitlines()
-            while True:
-                line = lines[lineno - 1]
-                if line.startswith("def "):
-                    return line.split("def ")[1].split("(")[0]
-                lineno -= 1
-                if lineno == 0:
-                    return "???"
+            tree = ast.parse(code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # TODO: Remove this if statement once 3.7 support is dropped
+                    if sys.version_info < (3, 8):
+                        if node.lineno <= lineno < node.lineno + node.body[0].lineno:
+                            return node.name
+                    else:
+                        if node.lineno <= lineno <= node.end_lineno:
+                            return node.name
+            return "???"
 
         def get_args(reprfuncargs: ReprFuncArgs) -> str:
             args = Text("")
@@ -402,7 +407,7 @@ class RichExceptionChainRepr:
         for last, entry in loop_last(chain.reprtraceback.reprentries):
             filename = entry.reprfileloc.path
             lineno = entry.reprfileloc.lineno
-            funcname = guess_funcname(lineno, filename)
+            funcname = get_funcname(lineno, filename)
             message = entry.reprfileloc.message
 
             text = Text.assemble(
