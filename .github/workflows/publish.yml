@@ -25,7 +25,7 @@ jobs:
         name: Configure pip caching
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-publish-pip-${{ hashFiles('**/setup.py') }}
+          key: ${{ runner.os }}-publish-pip-${{ hashFiles('**/setup.cfg') }}
           restore-keys: |
             - ${{ runner.os }}-publish-pip-
       - name: Install dependencies
