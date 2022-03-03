@@ -4,8 +4,6 @@ pytest-rich
 
 Leverage `rich`_ for richer test session output.
 
-This plugin is not published to PyPI yet.
-
 .. image:: https://img.shields.io/pypi/v/pytest-rich.svg
     :target: https://pypi.org/project/pytest-rich
     :alt: PyPI version
