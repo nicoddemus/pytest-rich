@@ -103,7 +103,7 @@ class RichTerminalReporter:
                 self.status_per_item[item.nodeid] = "collected"
                 self.items[item.nodeid] = item
             self.total_items_collected += len(items)
-            if self.collect_progress:
+            if self.collect_progress is not None:
                 self.collect_progress.update(
                     self.collect_task,
                     description=f"[cyan][bold]Collecting[/cyan] [magenta]{report.nodeid}[/magenta] ([green]{self.total_items_collected}[/green] total items)",
@@ -111,7 +111,7 @@ class RichTerminalReporter:
                 )
 
     def pytest_collection_finish(self, session: pytest.Session) -> None:
-        if self.collect_progress:
+        if self.collect_progress is not None:
             self.collect_progress.update(
                 self.collect_task,
                 description=f"[cyan][bold]Collected [green]{self.total_items_collected} [cyan]items",
@@ -207,7 +207,7 @@ class RichTerminalReporter:
         completed = len(completed_count) == len(items)
         percent = len(completed_count) * 100 // len(items)
         description = f"[cyan][{percent:3d}%] [/cyan]{base_fn} " + "".join(chars)
-        if self.runtest_progress:
+        if self.runtest_progress is not None:
             self.runtest_progress.update(
                 task,
                 description=description,
@@ -231,7 +231,7 @@ class RichTerminalReporter:
     def pytest_runtest_logfinish(self) -> None:
         self.total_items_completed += 1
         percent = (self.total_items_completed * 100) // self.total_items_collected
-        if self.runtest_progress:
+        if self.runtest_progress is not None:
             self.runtest_progress.update(
                 self.overall_progress_task,
                 description=f"Percent: [green]{percent}%[/green]",
