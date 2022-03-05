@@ -130,7 +130,7 @@ class RichTerminalReporter:
             ]
         )
         pypy_version_info = getattr(sys, "pypy_version_info", None)
-        if pypy_version_info:
+        if pypy_version_info is not None:
             column1.add_renderable(
                 f"pypy [cyan]{'.'.join(map(str, pypy_version_info[:3]))}"
             )
