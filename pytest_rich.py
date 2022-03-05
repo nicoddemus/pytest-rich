@@ -103,21 +103,22 @@ class RichTerminalReporter:
                 self.status_per_item[item.nodeid] = "collected"
                 self.items[item.nodeid] = item
             self.total_items_collected += len(items)
-            self.collect_progress.update(
-                self.collect_task,
-                description=f"[cyan][bold]Collecting[/cyan] [magenta]{report.nodeid}[/magenta] ([green]{self.total_items_collected}[/green] total items)",
-                refresh=True,
-            )
+            if self.collect_progress is not None:
+                self.collect_progress.update(
+                    self.collect_task,
+                    description=f"[cyan][bold]Collecting[/cyan] [magenta]{report.nodeid}[/magenta] ([green]{self.total_items_collected}[/green] total items)",
+                    refresh=True,
+                )
 
     def pytest_collection_finish(self, session: pytest.Session) -> None:
-        self.collect_progress.update(
-            self.collect_task,
-            description=f"[cyan][bold]Collected [green]{self.total_items_collected} [cyan]items",
-            completed=True,
-        )
-        self.collect_progress.stop()
-        self.collect_progress = None
-        self.collect_task = None
+        if self.collect_progress is not None:
+            self.collect_progress.update(
+                self.collect_task,
+                description=f"[cyan][bold]Collected [green]{self.total_items_collected} [cyan]items",
+                completed=True,
+            )
+            self.collect_progress.stop()
+            self.collect_progress = None
 
     def pytest_sessionstart(self, session: pytest.Session) -> None:
         py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
@@ -128,9 +129,11 @@ class RichTerminalReporter:
                 f"python [cyan]{py_version}",
             ]
         )
-        if getattr(sys, "pypy_version_info", None):
-            pypy_verinfo = ".".join(map(str, sys.pypy_version_info[:3]))
-            column1.add_renderable(f"pypy [cyan]{pypy_verinfo}")
+        pypy_version_info = getattr(sys, "pypy_version_info", None)
+        if pypy_version_info is not None:
+            column1.add_renderable(
+                f"pypy [cyan]{'.'.join(map(str, pypy_version_info[:3]))}"
+            )
         column2 = Columns([f"root [cyan][bold]{session.config.rootpath}"])
         self.console.print(
             Panel(Group(column1, column2), title=f"pytest session starts")
@@ -204,13 +207,14 @@ class RichTerminalReporter:
         completed = len(completed_count) == len(items)
         percent = len(completed_count) * 100 // len(items)
         description = f"[cyan][{percent:3d}%] [/cyan]{base_fn} " + "".join(chars)
-        self.runtest_progress.update(
-            task,
-            description=description,
-            refresh=True,
-            completed=completed,
-            visible=True,
-        )
+        if self.runtest_progress is not None:
+            self.runtest_progress.update(
+                task,
+                description=description,
+                refresh=True,
+                completed=completed,
+                visible=True,
+            )
 
     def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
         status: Optional[RichTerminalReporter.Status] = None
@@ -227,10 +231,11 @@ class RichTerminalReporter:
     def pytest_runtest_logfinish(self) -> None:
         self.total_items_completed += 1
         percent = (self.total_items_completed * 100) // self.total_items_collected
-        self.runtest_progress.update(
-            self.overall_progress_task,
-            description=f"Percent: [green]{percent}%[/green]",
-        )
+        if self.runtest_progress is not None:
+            self.runtest_progress.update(
+                self.overall_progress_task,
+                description=f"Percent: [green]{percent}%[/green]",
+            )
 
     def pytest_sessionfinish(
         self, session: pytest.Session, exitstatus: Union[int, pytest.ExitCode]
