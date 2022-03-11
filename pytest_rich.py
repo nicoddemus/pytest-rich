@@ -235,6 +235,7 @@ class RichTerminalReporter:
     def pytest_sessionfinish(
         self, session: pytest.Session, exitstatus: Union[int, pytest.ExitCode]
     ):
+        error_messages = {}
         if self.runtest_progress is not None:
             self.runtest_progress.stop()
             self.runtest_progress = None
@@ -243,7 +244,47 @@ class RichTerminalReporter:
             self.console.print(Rule("FAILURES", style="red"))
             for nodeid, report in self.failed_reports.items():
                 tb = RichExceptionChainRepr(nodeid, report.longrepr)
+                error_messages[nodeid] = tb.error_messages
                 self.console.print(tb)
+
+        if "-q" not in sys.argv:
+            self.print_summary(error_messages, all="-v" in sys.argv)
+
+    def print_summary(self, error_messages, all=False):
+        total_text = Text(f" Total::{self.total_items_completed}", style="bold blue")
+        success_text = Text(
+            f" Success::{self.total_items_completed - len(self.failed_reports)}",
+            style="bold green",
+        )
+        failed_text = Text(f" Failed::{len(self.failed_reports)}", style="bold red")
+        self.console.print(
+            Rule(
+                Text("Short test summary info")
+                + total_text
+                + success_text
+                + failed_text,
+                characters="=",
+                style="blue",
+            )
+        )
+
+        if all:
+            for nodeid, status in self.status_per_item.items():
+                if status == "success":
+                    self.console.print(
+                        Text("SUCCESS ", style="green")
+                        + Text(f"{nodeid}", style="black")
+                    )
+
+            self.console.print(Rule(characters="-", style="blue"))
+
+        for nodeid, errors in error_messages.items():
+            self.console.print(
+                Text("FAILED ", style="red")
+                + Text(f"{nodeid} {''.join(errors)}", style="black")
+            )
+
+        self.console.print(Rule("The End", characters="=", style="blue"))
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
@@ -272,6 +313,7 @@ class RichExceptionChainRepr:
 
     def __attrs_post_init__(self):
         self.theme = Syntax.get_theme(self.theme)
+        self.error_messages = []
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -459,6 +501,7 @@ class RichExceptionChainRepr:
                     repr_highlighter(get_error_source(entry.lines)),
                 )
                 for err_msg in get_err_msgs(entry.lines):
+                    self.error_messages.append(err_msg)
                     yield Text.assemble(
                         ("E ", Style(color="red")),
                         repr_highlighter(err_msg),
