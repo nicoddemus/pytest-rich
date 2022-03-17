@@ -262,14 +262,12 @@ class RichTerminalReporter:
     def print_summary(self, error_messages, all=False):
         total_text = Text(f" Total::{self.total_items_completed}", style="bold blue")
         success_text = Text(
-            f" Success::{self.total_items_completed - len(self.failed_reports)}",
+            f"Success::{self.total_items_completed - len(self.failed_reports)}",
             style="bold green",
         )
         failed_text = Text(f" Failed::{len(self.failed_reports)}", style="bold red")
         self.console.print(
-            Rule(
-                Text("Short test summary info")
-                + total_text
+            Rule(total_text
                 + success_text
                 + failed_text,
                 characters="=",
@@ -281,19 +279,17 @@ class RichTerminalReporter:
             for nodeid, status in self.status_per_item.items():
                 if status == "success":
                     self.console.print(
-                        Text("SUCCESS ", style="green")
-                        + Text(f"{nodeid}", style="black")
+                        Text("SUCCESS ", style="green"),
+                        Text(f"{nodeid}")
                     )
 
             self.console.print(Rule(characters="-", style="blue"))
 
         for nodeid, errors in error_messages.items():
             self.console.print(
-                Text("FAILED ", style="red")
-                + Text(f"{nodeid} {''.join(errors)}", style="black")
+                Text("FAILED ", style="red"),
+                Text(f"{nodeid} {''.join(errors)}")
             )
-
-        self.console.print(Rule("The End", characters="=", style="blue"))
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
