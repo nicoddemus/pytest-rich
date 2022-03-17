@@ -256,8 +256,8 @@ class RichTerminalReporter:
                 error_messages[nodeid] = tb.error_messages
                 self.console.print(tb)
 
-        if "-q" not in sys.argv:
-            self.print_summary(error_messages, all="-v" in sys.argv)
+        if self.config.getoption("verbose") >= 0:
+            self.print_summary(error_messages, all=self.config.getoption("verbose") > 0)
 
     def print_summary(self, error_messages, all=False):
         total_text = Text(f" Total::{self.total_items_completed}", style="bold blue")
