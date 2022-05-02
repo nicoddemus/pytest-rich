@@ -247,6 +247,7 @@ class RichTerminalReporter:
         if self.failed_reports:
             self.console.print(Rule("FAILURES", style="red"))
             for nodeid, report in self.failed_reports.items():
+                assert isinstance(report.longrepr, ExceptionChainRepr)
                 tb = RichExceptionChainRepr(nodeid, report.longrepr)
                 self.console.print(tb)
 
@@ -271,7 +272,7 @@ class RichExceptionChainRepr:
     nodeid: str
     chain: ExceptionChainRepr
     extra_lines: int = 3
-    theme: Optional[str] = "ansi_dark"
+    theme: Optional[str] | SyntaxTheme = "ansi_dark"
     word_wrap: bool = True
     indent_guides: bool = True
 
@@ -282,6 +283,7 @@ class RichExceptionChainRepr:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         theme = self.theme
+        assert isinstance(theme, SyntaxTheme)
         background_style = theme.get_background_style()
         token_style = theme.get_style_for_token
 
@@ -320,6 +322,8 @@ class RichExceptionChainRepr:
 
         path_highlighter = PathHighlighter()
         for entry in self.chain.reprtraceback.reprentries:
+            assert isinstance(entry, ReprEntry)
+            assert isinstance(entry.reprfileloc, ReprFileLocation)
             if entry.reprfileloc.message:
                 yield Text.assemble(
                     path_highlighter(
@@ -340,6 +344,7 @@ class RichExceptionChainRepr:
         path_highlighter = PathHighlighter()
         repr_highlighter = ReprHighlighter()
         theme = self.theme
+        assert isinstance(theme, SyntaxTheme)
         code_cache: Dict[str, str] = {}
 
         def read_code(filename: str) -> str:
@@ -382,13 +387,15 @@ class RichExceptionChainRepr:
                         if node.lineno <= lineno < node.lineno + node.body[0].lineno:
                             return node.name
                     else:
-                        if node.lineno <= lineno <= node.end_lineno:
-                            return node.name
+                        if node.end_lineno is not None:
+                            if node.lineno <= lineno <= node.end_lineno:
+                                return node.name
             return "???"
 
-        def get_args(reprfuncargs: ReprFuncArgs) -> str:
+        def get_args(reprfuncargs: ReprFuncArgs) -> Text:
             args = Text("")
             for arg in reprfuncargs.args:
+                assert isinstance(arg[1], str)
                 args.append(
                     Text.assemble(
                         (arg[0], "name.variable"),
@@ -400,12 +407,13 @@ class RichExceptionChainRepr:
                     args.append(Text(", "))
             return args
 
-        def get_error_source(lines: List[str]) -> str:
+        def get_error_source(lines: Sequence[str]) -> str:
             for line in lines:
                 if line.startswith(">"):
                     return line.split(">")[1].strip()
+            return ""
 
-        def get_err_msgs(lines: List[str]) -> str:
+        def get_err_msgs(lines: Sequence[str]) -> list[str]:
             err_lines = []
             for line in lines:
                 if line.startswith("E"):
@@ -413,6 +421,8 @@ class RichExceptionChainRepr:
             return err_lines
 
         for last, entry in loop_last(chain.reprtraceback.reprentries):
+            assert isinstance(entry, ReprEntry)
+            assert entry.reprfileloc is not None
             filename = entry.reprfileloc.path
             lineno = entry.reprfileloc.lineno
             funcname = get_funcname(lineno, filename)
@@ -428,6 +438,7 @@ class RichExceptionChainRepr:
             )
             yield text
 
+            assert entry.reprfuncargs is not None
             args = get_args(entry.reprfuncargs)
             if args:
                 yield args
