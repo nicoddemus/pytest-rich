@@ -275,18 +275,14 @@ class RichExceptionChainRepr:
     nodeid: str
     chain: ExceptionChainRepr
     extra_lines: int = 3
-    theme: Union[Optional[str], SyntaxTheme] = "ansi_dark"
+    theme: Optional[str] = "ansi_dark"
     word_wrap: bool = True
     indent_guides: bool = True
-
-    def __attrs_post_init__(self):
-        self.theme = Syntax.get_theme(self.theme)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        theme = self.theme
-        assert isinstance(theme, SyntaxTheme)
+        theme = self.get_theme()
         background_style = theme.get_background_style()
         token_style = theme.get_style_for_token
 
@@ -346,8 +342,7 @@ class RichExceptionChainRepr:
     ) -> RenderResult:
         path_highlighter = PathHighlighter()
         repr_highlighter = ReprHighlighter()
-        theme = self.theme
-        assert isinstance(theme, SyntaxTheme)
+        theme = self.get_theme()
         code_cache: Dict[str, str] = {}
 
         def read_code(filename: str) -> str:
@@ -486,3 +481,13 @@ class RichExceptionChainRepr:
             if not last:
                 yield ""
                 yield Rule(style=Style(color="red", dim=True))
+
+    def get_theme(self) -> SyntaxTheme:
+        """
+        Get SyntaxTheme from `theme` class attribute.
+
+        Theme is set via a string attribute option. We need to pass the
+        string through Rich's Syntax class to get the actual SyntaxTheme
+        object.
+        """
+        return Syntax.get_theme(self.theme)
