@@ -16,6 +16,8 @@ import attr
 import pytest
 from _pytest._code.code import ExceptionChainRepr
 from _pytest._code.code import ExceptionRepr
+from _pytest._code.code import ReprEntry
+from _pytest._code.code import ReprFileLocation
 from _pytest._code.code import ReprFuncArgs
 from pygments.token import Comment
 from pygments.token import Keyword
@@ -42,6 +44,7 @@ from rich.progress import TaskID
 from rich.rule import Rule
 from rich.style import Style
 from rich.syntax import Syntax
+from rich.syntax import SyntaxTheme
 from rich.text import Text
 from rich.theme import Theme
 from rich.traceback import PathHighlighter
