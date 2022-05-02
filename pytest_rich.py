@@ -275,7 +275,7 @@ class RichExceptionChainRepr:
     nodeid: str
     chain: ExceptionChainRepr
     extra_lines: int = 3
-    theme: Optional[str] | SyntaxTheme = "ansi_dark"
+    theme: Union[Optional[str], SyntaxTheme] = "ansi_dark"
     word_wrap: bool = True
     indent_guides: bool = True
 
