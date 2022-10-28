@@ -13,9 +13,7 @@ import attr
 import pytest
 from _pytest._code.code import ExceptionChainRepr
 from _pytest._code.code import ExceptionRepr
-from rich.columns import Columns
 from rich.console import Console
-from rich.console import Group
 from rich.live import Live
 from rich.padding import Padding
 from rich.panel import Panel
@@ -26,6 +24,7 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
+from pytest_rich.header import generate_header_panel
 from pytest_rich.traceback import RichExceptionChainRepr
 
 if sys.version_info < (3, 8):
@@ -93,23 +92,9 @@ class RichTerminalReporter:
             self.collect_progress = None
 
     def pytest_sessionstart(self, session: pytest.Session) -> None:
-        py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        column1 = Columns(
-            [
-                f"platform [green]{sys.platform}",
-                f"pytest [cyan]{pytest.__version__}",
-                f"python [cyan]{py_version}",
-            ]
-        )
-        pypy_version_info = getattr(sys, "pypy_version_info", None)
-        if pypy_version_info is not None:
-            column1.add_renderable(
-                f"pypy [cyan]{'.'.join(map(str, pypy_version_info[:3]))}"
-            )
-        column2 = Columns([f"root [cyan][bold]{session.config.rootpath}"])
-        self.console.print(
-            Panel(Group(column1, column2), title="pytest session starts")
-        )
+        header = generate_header_panel(session)
+
+        self.console.print(header)
 
     def pytest_internalerror(self, excrepr: ExceptionRepr) -> None:
         ...
