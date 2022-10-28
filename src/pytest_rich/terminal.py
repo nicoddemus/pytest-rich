@@ -24,7 +24,7 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
-from pytest_rich.header import RichTerminalHeader
+from pytest_rich.header import generate_header_panel
 from pytest_rich.traceback import RichExceptionChainRepr
 
 if sys.version_info < (3, 8):
@@ -92,10 +92,7 @@ class RichTerminalReporter:
             self.collect_progress = None
 
     def pytest_sessionstart(self, session: pytest.Session) -> None:
-        # mypy insists that `RichTerminalHeader` is called with too many
-        # arguments, but it's not and works fine. MyPy bug or something
-        # funny going on with `attrs`?
-        header = RichTerminalHeader(session)  # type: ignore [call-arg]
+        header = generate_header_panel(session)
 
         self.console.print(header)
 
