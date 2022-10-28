@@ -259,17 +259,20 @@ class RichTerminalReporter:
         if self.config.getoption("verbose") >= 0:
             self.print_summary(error_messages, all=self.config.getoption("verbose") > 0)
 
+
     def print_summary(self, error_messages, all=False):
-        total_text = Text(f" Total::{self.total_items_completed}", style="bold blue")
+        total_text = Text(f"Total: {self.total_items_completed} ", style="bold blue")
         success_text = Text(
-            f"Success::{self.total_items_completed - len(self.failed_reports)}",
+            f"Success: {self.total_items_completed - len(self.failed_reports)} ",
             style="bold green",
         )
-        failed_text = Text(f" Failed::{len(self.failed_reports)}", style="bold red")
+        if self.failed_reports:
+            failed_text = Text(f"Failed: {len(self.failed_reports)}", style="bold red") 
+        else:
+            failed_text = ""
         self.console.print(
-            Rule(total_text
-                + success_text
-                + failed_text,
+            Rule(
+                total_text + success_text + failed_text,
                 characters="=",
                 style="blue",
             )
@@ -279,16 +282,14 @@ class RichTerminalReporter:
             for nodeid, status in self.status_per_item.items():
                 if status == "success":
                     self.console.print(
-                        Text("SUCCESS ", style="green"),
-                        Text(f"{nodeid}")
+                        Text("SUCCESS ", style="green"), Text(f"{nodeid}")
                     )
 
             self.console.print(Rule(characters="-", style="blue"))
 
         for nodeid, errors in error_messages.items():
             self.console.print(
-                Text("FAILED ", style="red"),
-                Text(f"{nodeid} {''.join(errors)}")
+                Text("FAILED ", style="red"), Text(f"{nodeid} {''.join(errors)}")
             )
 
     def pytest_keyboard_interrupt(
