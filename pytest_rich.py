@@ -259,17 +259,16 @@ class RichTerminalReporter:
         if self.config.getoption("verbose") >= 0:
             self.print_summary(error_messages, all=self.config.getoption("verbose") > 0)
 
-
     def print_summary(self, error_messages, all=False):
         total_text = Text(f"Total: {self.total_items_completed} ", style="bold blue")
         success_text = Text(
             f"Success: {self.total_items_completed - len(self.failed_reports)} ",
             style="bold green",
         )
-        if self.failed_reports:
-            failed_text = Text(f"Failed: {len(self.failed_reports)}", style="bold red") 
-        else:
-            failed_text = ""
+        failed_text = ""
+        if len(self.failed_reports) > 0:
+            failed_text = Text(f"Failed: {len(self.failed_reports)}", style="bold red")
+
         self.console.print(
             Rule(
                 total_text + success_text + failed_text,
@@ -316,6 +315,7 @@ class RichExceptionChainRepr:
     theme: Optional[str] = "ansi_dark"
     word_wrap: bool = True
     indent_guides: bool = True
+    error_messages: Optional[list] = []
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
