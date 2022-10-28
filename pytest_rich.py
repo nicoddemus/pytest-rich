@@ -4,6 +4,7 @@ Proof of concept for pytest + rich integration.
 import ast
 import sys
 import warnings
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -37,6 +38,7 @@ from rich.console import group
 from rich.console import RenderResult
 from rich.highlighter import ReprHighlighter
 from rich.live import Live
+from rich.padding import Padding
 from rich.panel import Panel
 from rich.progress import Progress
 from rich.progress import SpinnerColumn
@@ -45,6 +47,7 @@ from rich.rule import Rule
 from rich.style import Style
 from rich.syntax import Syntax
 from rich.syntax import SyntaxTheme
+from rich.table import Table
 from rich.text import Text
 from rich.theme import Theme
 from rich.traceback import PathHighlighter
@@ -53,6 +56,8 @@ if sys.version_info < (3, 8):
     from typing_extensions import Literal
 else:
     from typing import Literal
+
+HORIZONTAL_PAD = (0, 1, 0, 1)
 
 
 def pytest_addoption(parser):
@@ -87,9 +92,13 @@ class RichTerminalReporter:
         self.status_per_item: Dict[str, RichTerminalReporter.Status] = {}
         self.items: Dict[str, pytest.Item] = {}
         self.runtest_tasks_per_file: Dict[Path, TaskID] = {}
-        self.failed_reports: Dict[str, pytest.TestReport] = {}
-
+        self.categorized_reports: Dict[str, List[pytest.TestReport]] = defaultdict(list)
         self.summary: Optional[Live] = None
+        self.total_duration: float = 0
+
+    def _preserve_report(self, report) -> None:
+        self.categorized_reports[report.outcome].append(report)
+        self.total_duration += report.duration
 
     def pytest_collection(self) -> None:
         self.collect_progress = Progress(
@@ -139,7 +148,7 @@ class RichTerminalReporter:
             )
         column2 = Columns([f"root [cyan][bold]{session.config.rootpath}"])
         self.console.print(
-            Panel(Group(column1, column2), title=f"pytest session starts")
+            Panel(Group(column1, column2), title="pytest session starts")
         )
 
     def pytest_internalerror(self, excrepr: ExceptionRepr) -> None:
@@ -225,8 +234,7 @@ class RichTerminalReporter:
             status = "running"
         elif report.when == "call":
             status = "success" if report.outcome == "passed" else "fail"
-        if report.outcome != "passed":
-            self.failed_reports[report.nodeid] = report
+            self._preserve_report(report)
         if status is not None:
             self.status_per_item[report.nodeid] = status
             self._update_task(report.nodeid)
@@ -248,34 +256,61 @@ class RichTerminalReporter:
             self.runtest_progress.stop()
             self.runtest_progress = None
             self.runtest_tasks_per_file.clear()
-        if self.failed_reports:
-            self.console.print(Rule("FAILURES", style="red"))
-            for nodeid, report in self.failed_reports.items():
-                assert isinstance(report.longrepr, ExceptionChainRepr)
-                tb = RichExceptionChainRepr(nodeid, report.longrepr)
-                error_messages[nodeid] = tb.error_messages
-                self.console.print(tb)
+
+        for index, report in enumerate(self.categorized_reports["failed"]):
+            if index == 0:
+                self.console.print(Rule("FAILURES\n", style="bold red"))
+            nodeid = report.nodeid
+            assert isinstance(report.longrepr, ExceptionChainRepr)
+            tb = RichExceptionChainRepr(nodeid, report.longrepr)
+            error_messages[nodeid] = tb.error_messages
+            self.console.print(tb)
 
         if self.config.getoption("verbose") >= 0:
             self.print_summary(error_messages, all=self.config.getoption("verbose") > 0)
 
     def print_summary(self, error_messages, all=False):
-        total_text = Text(f"Total: {self.total_items_completed} ", style="bold blue")
-        success_text = Text(
-            f"Success: {self.total_items_completed - len(self.failed_reports)} ",
-            style="bold green",
-        )
-        failed_text = ""
-        if len(self.failed_reports) > 0:
-            failed_text = Text(f"Failed: {len(self.failed_reports)}", style="bold red")
+        summary_table = Table.grid()
+        summary_table.add_column(justify="right")
+        summary_table.add_column()
+        summary_table.add_column()
 
-        self.console.print(
-            Rule(
-                total_text + success_text + failed_text,
-                characters="=",
-                style="blue",
-            )
+        summary_table.add_row(
+            Padding(
+                str(self.total_items_completed),
+                pad=HORIZONTAL_PAD,
+                style="bold cyan",
+            ),
+            Padding(
+                "Total Tests",
+                pad=HORIZONTAL_PAD,
+            ),
+            style="default",
         )
+
+        style_dict = {
+            "passed": "bold green",
+            "failed": "bold red",
+        }
+        for state, reports in self.categorized_reports.items():
+            no_of_items = len(reports)
+            if no_of_items > 0:
+                summary_table.add_row(
+                    Padding(
+                        str(no_of_items),
+                        pad=HORIZONTAL_PAD,
+                    ),
+                    Padding(
+                        state.title(),
+                        pad=HORIZONTAL_PAD,
+                    ),
+                    Padding(
+                        f"({100 * no_of_items / self.total_items_completed:.1f}%)",
+                        pad=HORIZONTAL_PAD,
+                    ),
+                    #
+                    style=style_dict[state],
+                )
 
         if all:
             for nodeid, status in self.status_per_item.items():
@@ -284,12 +319,31 @@ class RichTerminalReporter:
                         Text("SUCCESS ", style="green"), Text(f"{nodeid}")
                     )
 
-            self.console.print(Rule(characters="-", style="blue"))
-
+        status = "SUCCESS"
         for nodeid, errors in error_messages.items():
+            status = "FAILED"
             self.console.print(
-                Text("FAILED ", style="red"), Text(f"{nodeid} {''.join(errors)}")
+                Text("FAILED ", style="red"),
+                Text(f"{nodeid} {''.join(errors)}"),
             )
+            
+
+        result_summary_panel = Panel(
+            summary_table,
+            title="Summary",
+            style="bold blue",
+            expand=False,
+            border_style="bold blue",
+        )
+        self.console.print("\n")
+        self.console.print(result_summary_panel)
+        self.console.print(
+            Rule(
+                title=f"{status} in {self.total_duration:.2f} seconds",
+                characters="-",
+                style="green" if status == "SUCCEEDED" else "red",
+            )
+        )
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
