@@ -30,8 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release!
 
+<!-- Releases links -->
+
 [unreleased]: https://github.com/nicoddemus/pytest-rich/compare/v0.1.1...HEAD
 [0.1.1]: https://github.com/nicoddemus/pytest-rich/releases/tag/v0.1.1
 [0.1.0]: https://github.com/nicoddemus/pytest-rich/releases/tag/v0.1.0
+
+<!-- PR links -->
+
 [#31]: https://github.com/nicoddemus/pytest-rich/pull/31
 [#40]: https://github.com/nicoddemus/pytest-rich/pull/40
