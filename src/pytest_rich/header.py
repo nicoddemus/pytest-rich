@@ -1,5 +1,5 @@
 import sys
-from typing import Iterable
+from typing import Union
 
 import pytest
 from _pytest.main import Session
@@ -9,16 +9,14 @@ from rich.console import Group
 from rich.panel import Panel
 
 
-def generate_header_panel(
-    session: Session, title: str = "pytest session starts"
-) -> Panel:
+def generate_header_panel(session: Session) -> Panel:
     columns = [
         _generate_sysinfo_col(),
         _generate_root_col(session),
-        *_generate_plugins_col(session),
+        _generate_plugins_col(session),
     ]
 
-    return Panel(Group(*columns), title=title)
+    return Panel(Group(*columns))
 
 
 def _generate_sysinfo_col() -> Columns:
@@ -41,12 +39,14 @@ def _generate_root_col(session: Session) -> Columns:
     return Columns([f"root [cyan][bold]{session.config.rootpath}"])
 
 
-def _generate_plugins_col(session: Session) -> Iterable[Columns]:
+def _generate_plugins_col(session: Session) -> Union[Columns, None]:
     plugins = session.config.pluginmanager.list_plugin_distinfo()
 
-    if plugins:
-        yield Columns(
-            [
-                f"plugins [cyan]{', '.join(_plugin_nameversions(plugins))}",
-            ]
-        )
+    if plugins is None:
+        return None
+
+    return Columns(
+        [
+            f"plugins [cyan]{', '.join(_plugin_nameversions(plugins))}",
+        ]
+    )
