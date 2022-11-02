@@ -92,9 +92,12 @@ class RichTerminalReporter:
             self.collect_progress = None
 
     def pytest_sessionstart(self, session: pytest.Session) -> None:
-        header = generate_header_panel(session)
+        self.console.print(Rule("pytest session starts", style="default"))
 
-        self.console.print(header)
+        if self.no_header is False:
+            header = generate_header_panel(session)
+
+            self.console.print(header)
 
     def pytest_internalerror(self, excrepr: ExceptionRepr) -> None:
         ...
@@ -196,25 +199,35 @@ class RichTerminalReporter:
     def pytest_sessionfinish(
         self, session: pytest.Session, exitstatus: Union[int, pytest.ExitCode]
     ):
-        error_messages = {}
         if self.runtest_progress is not None:
             self.runtest_progress.stop()
             self.runtest_progress = None
             self.runtest_tasks_per_file.clear()
 
-        for index, report in enumerate(self.categorized_reports["failed"]):
-            if index == 0:
-                self.console.print(Rule("FAILURES\n", style="bold red"))
-            nodeid = report.nodeid
-            assert isinstance(report.longrepr, ExceptionChainRepr)
-            tb = RichExceptionChainRepr(nodeid, report.longrepr)
-            error_messages[nodeid] = tb.error_messages
-            self.console.print(tb)
+        if self.no_summary is False:
+            error_messages = {}
+            for index, report in enumerate(self.categorized_reports["failed"]):
+                if index == 0:
+                    self.console.print(Rule("FAILURES\n", style="bold red"))
+                nodeid = report.nodeid
+                assert isinstance(report.longrepr, ExceptionChainRepr)
+                tb = RichExceptionChainRepr(nodeid, report.longrepr)
+                error_messages[nodeid] = tb.error_messages
+                self.console.print(tb)
 
-        if self.config.getoption("verbose") >= 0:
-            self.print_summary(error_messages, all=self.config.getoption("verbose") > 0)
+            if self.verbosity_level >= 0:
+                self.print_summary(error_messages)
 
-    def print_summary(self, error_messages, all=False):
+        status = "SUCCEEDED" if exitstatus == 0 else "FAILED"
+
+        self.console.print(
+            Rule(
+                title=f"{status} in {self.total_duration:.2f} seconds",
+                style="green" if status == "SUCCEEDED" else "red",
+            )
+        )
+
+    def print_summary(self, error_messages):
         summary_table = Table.grid()
         summary_table.add_column(justify="right")
         summary_table.add_column()
@@ -236,6 +249,7 @@ class RichTerminalReporter:
         style_dict = {
             "passed": "bold green",
             "failed": "bold red",
+            "skipped": "bold yellow",
         }
         for state, reports in self.categorized_reports.items():
             no_of_items = len(reports)
@@ -257,16 +271,14 @@ class RichTerminalReporter:
                     style=style_dict[state],
                 )
 
-        if all:
+        if self.verbose is True:
             for nodeid, status in self.status_per_item.items():
                 if status == "success":
                     self.console.print(
                         Text("SUCCESS ", style="green"), Text(f"{nodeid}")
                     )
 
-        status = "SUCCESS"
         for nodeid, errors in error_messages.items():
-            status = "FAILED"
             self.console.print(
                 Text("FAILED ", style="red"),
                 Text(f"{nodeid} {''.join(errors)}"),
@@ -281,13 +293,6 @@ class RichTerminalReporter:
         )
         self.console.print("\n")
         self.console.print(result_summary_panel)
-        self.console.print(
-            Rule(
-                title=f"{status} in {self.total_duration:.2f} seconds",
-                characters="-",
-                style="green" if status == "SUCCEEDED" else "red",
-            )
-        )
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
@@ -296,3 +301,19 @@ class RichTerminalReporter:
 
     def pytest_unconfigure(self) -> None:
         ...
+
+    @property
+    def verbose(self) -> bool:
+        return self.config.getoption("verbose") > 0
+
+    @property
+    def verbosity_level(self) -> int:
+        return self.config.getoption("verbose")
+
+    @property
+    def no_header(self) -> bool:
+        return self.config.getoption("no_header")
+
+    @property
+    def no_summary(self) -> bool:
+        return self.config.getoption("no_summary")
