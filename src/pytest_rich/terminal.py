@@ -55,6 +55,8 @@ class RichTerminalReporter:
         self.summary: Optional[Live] = None
         self.total_duration: float = 0
 
+        self.console.record = self.config.getoption("rich_capture")
+
     def _preserve_report(self, report) -> None:
         self.categorized_reports[report.outcome].append(report)
         self.total_duration += report.duration
@@ -227,6 +229,9 @@ class RichTerminalReporter:
             )
         )
 
+        if self.console.record is True:
+            self._save_terminal_output()
+
     def print_summary(self, error_messages):
         summary_table = Table.grid()
         summary_table.add_column(justify="right")
@@ -293,6 +298,16 @@ class RichTerminalReporter:
         )
         self.console.print("\n")
         self.console.print(result_summary_panel)
+
+    def _save_terminal_output(self) -> None:
+        filename = f"{self.config.getoption('rich_capture_file_name')}.{self.config.getoption('rich_capture_file_type')}"
+
+        save_func = getattr(
+            locals()["self"].console,
+            f"save_{self.config.getoption('rich_capture_file_type')}",
+        )
+
+        save_func(filename)
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
