@@ -15,7 +15,7 @@ def generate_header_panel(session: Session) -> Panel:
         _generate_sysinfo_col(),
         _generate_root_col(session),
         _generate_plugins_col(session),
-        *_generate_header_hook(session),
+        *_generate_header_hook_cols(session),
     ]
 
     return Panel(Group(*columns))
@@ -54,7 +54,7 @@ def _generate_plugins_col(session: Session) -> Union[Columns, None]:
     )
 
 
-def _generate_header_hook(session: Session) -> Iterable[Columns]:
+def _generate_header_hook_cols(session: Session) -> Iterable[Columns]:
     lines = session.config.hook.pytest_report_header(
         config=session.config, start_path=session.config.invocation_params.dir
     )
