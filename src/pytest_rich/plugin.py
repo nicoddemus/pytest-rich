@@ -29,8 +29,8 @@ def pytest_addoption(parser):
         "--rich-capture         => 'pytest_rich-20200101_000000.svg'\n"
         "--rich-capture=out     => 'out.svg'\n"
         "--rich-capture=out.txt => 'out.txt'\n"
-        "--rich-capture=.txt    => 'pytest_rich-20200101_000000.html'\n"
-        "--rich-capture=txt     => 'pytest_rich-20200101_000000.html'\n",
+        "--rich-capture=.txt    => 'pytest_rich-20200101_000000.txt'\n"
+        "--rich-capture=txt     => 'pytest_rich-20200101_000000.txt'\n",
     )
 
 
