@@ -35,8 +35,6 @@ def _get_filename_from_arg(arg: str) -> str:
 
     Returns:
         str: Filename.
-
-
     """
 
     ACCEPTED_FILE_TYPES = ["svg", "html", "txt"]
