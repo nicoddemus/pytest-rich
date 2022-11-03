@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Confirmed Python 3.11 support. ([#39])
 - Added test summary to the end of the test run. ([#31])
 - Added support for `--no-header` and `--no-summary` command line options. ([#64])
-- Added support for capturing terminal output using Rich's `Console` class, with three new command line options: `--rich-capture`, `--rich-capture-file-name`, and `--rich-capture-file-type`. ([#65])
+- Added support for capturing terminal output using Rich's `Console` class, with command line option `--rich-capture`. ([#65])
 
 ## [0.1.1] - 2022-03-03
 

@@ -1,7 +1,6 @@
 """
 Proof of concept for pytest + rich integration.
 """
-import datetime
 import sys
 
 import pytest
@@ -19,23 +18,34 @@ def pytest_addoption(parser):
     )
     group.addoption(
         "--rich-capture",
-        action="store_true",
-        default=False,
-        help="Capture terminal output using rich",
-    )
-    group.addoption(
-        "--rich-capture-file-name",
         action="store",
-        default=f"{__name__.split('.')[0]}-{datetime.datetime.now().isoformat().replace(':', '.')}",
-        help="File name to use for rich terminal capture (only if --rich-capture is also enabled). Default is <module name>-<datetime>",
+        nargs="?",
+        type=str,
+        const="",
+        help="Capture terminal output using rich. Takes an optional string to supply the file name and/or type.\n"
+        "File name: defaults to 'pytest_rich' plus a timestamp\n"
+        "File types: 'svg' (default), 'html', 'txt' \n"
+        "Examples:\n"
+        "--rich-capture         => 'pytest_rich-20200101_000000.svg'\n"
+        "--rich-capture=out     => 'out.svg'\n"
+        "--rich-capture=out.txt => 'out.txt'\n"
+        "--rich-capture=.txt    => 'pytest_rich-20200101_000000.html'\n"
+        "--rich-capture=txt     => 'pytest_rich-20200101_000000.html'\n",
     )
-    group.addoption(
-        "--rich-capture-file-type",
-        action="store",
-        choices=["svg", "html", "txt"],
-        default="svg",
-        help="File type to use for rich terminal capture (only if --rich-capture is also enabled). Default: svg.",
-    )
+
+    # group.addoption(
+    #     "--rich-capture-file-name",
+    #     action="store",
+    #     default=f"{__name__.split('.')[0]}-{datetime.datetime.now().isoformat().replace(':', '.')}",
+    #     help="File name to use for rich terminal capture (only if --rich-capture is also enabled). Default is <module name>-<datetime>",
+    # )
+    # group.addoption(
+    #     "--rich-capture-file-type",
+    #     action="store",
+    #     choices=["svg", "html", "txt"],
+    #     default="svg",
+    #     help="File type to use for rich terminal capture (only if --rich-capture is also enabled). Default: svg.",
+    # )
 
 
 @pytest.hookimpl(trylast=True)
