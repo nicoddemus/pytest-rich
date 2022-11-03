@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from datetime import timezone
 from pathlib import Path
 from typing import Tuple
 
@@ -40,7 +41,7 @@ def _get_filename_from_arg(arg: str) -> Tuple[str, str]:
 
     ACCEPTED_FILE_TYPES = ["svg", "html", "txt"]
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
     if not arg:
         # if no argument is supplied, use the module name and a timestamp

@@ -1,10 +1,13 @@
 from datetime import datetime
+from datetime import timezone
 
 import pytest
+from freezegun import freeze_time
 
 from pytest_rich.capture import _get_filename_from_arg
 
-TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
+NOW = datetime.now(timezone.utc)
+TIMESTAMP = NOW.strftime("%Y%m%d_%H%M%S")
 
 
 @pytest.mark.parametrize(
@@ -17,6 +20,7 @@ TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
         ("out.txt", ("out", "txt")),
     ],
 )
+@freeze_time(NOW)
 def test_get_filename_from_arg(arg: str, expected: str) -> None:
     """Test _get_filename_from_arg."""
     assert _get_filename_from_arg(arg) == expected

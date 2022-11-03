@@ -23,7 +23,7 @@ def pytest_addoption(parser):
         type=str,
         const="",
         help="Capture terminal output using rich. Takes an optional string to supply the file name and/or type.\n"
-        "File name: defaults to 'pytest_rich' plus a timestamp\n"
+        "File name: defaults to 'pytest_rich' plus a UTC timestamp\n"
         "File types: 'svg' (default), 'html', 'txt' \n"
         "Examples:\n"
         "--rich-capture         => 'pytest_rich-20200101_000000.svg'\n"
