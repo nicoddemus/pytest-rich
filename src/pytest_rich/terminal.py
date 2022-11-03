@@ -24,6 +24,7 @@ from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
 
+from pytest_rich.capture import save_terminal_output
 from pytest_rich.header import generate_header_panel
 from pytest_rich.traceback import RichExceptionChainRepr
 
@@ -54,6 +55,7 @@ class RichTerminalReporter:
         self.categorized_reports: Dict[str, List[pytest.TestReport]] = defaultdict(list)
         self.summary: Optional[Live] = None
         self.total_duration: float = 0
+        self.console.record = self.config.getoption("rich_capture") is not None
 
     def _preserve_report(self, report) -> None:
         self.categorized_reports[report.outcome].append(report)
@@ -226,6 +228,9 @@ class RichTerminalReporter:
                 style="green" if status == "SUCCEEDED" else "red",
             )
         )
+
+        if self.console.record is True:
+            save_terminal_output(self.console, self.config.getoption("rich_capture"))
 
     def print_summary(self, error_messages):
         summary_table = Table.grid()
