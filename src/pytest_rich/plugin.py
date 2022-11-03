@@ -33,20 +33,6 @@ def pytest_addoption(parser):
         "--rich-capture=txt     => 'pytest_rich-20200101_000000.html'\n",
     )
 
-    # group.addoption(
-    #     "--rich-capture-file-name",
-    #     action="store",
-    #     default=f"{__name__.split('.')[0]}-{datetime.datetime.now().isoformat().replace(':', '.')}",
-    #     help="File name to use for rich terminal capture (only if --rich-capture is also enabled). Default is <module name>-<datetime>",
-    # )
-    # group.addoption(
-    #     "--rich-capture-file-type",
-    #     action="store",
-    #     choices=["svg", "html", "txt"],
-    #     default="svg",
-    #     help="File type to use for rich terminal capture (only if --rich-capture is also enabled). Default: svg.",
-    # )
-
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
