@@ -2,7 +2,7 @@ def test_outcomes(pytester):
     pytester.copy_example("test_basic.py")
 
     outcomes = {
-        "passed": 2,
+        "passed": 3,
         "skipped": 4,
         "failed": 2,
         "errors": 2,
