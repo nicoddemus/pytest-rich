@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 
 
@@ -89,3 +91,7 @@ def test_nested_failure():
 #             inner_inner_inner()
 #         inner_inner()
 #     inner()
+
+
+def test_warning():
+    warnings.warn("warning")
