@@ -101,21 +101,17 @@ class RichTerminalReporter:
 
             self.console.print(header)
 
-    def pytest_internalerror(self, excrepr: ExceptionRepr) -> None:
-        ...
+    def pytest_internalerror(self, excrepr: ExceptionRepr) -> None: ...
 
     def pytest_warning_recorded(
         self,
         warning_message: warnings.WarningMessage,
         nodeid: str,
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    def pytest_deselected(self, items: Sequence[pytest.Item]) -> None:
-        ...
+    def pytest_deselected(self, items: Sequence[pytest.Item]) -> None: ...
 
-    def pytest_plugin_registered(self, plugin) -> None:
-        ...
+    def pytest_plugin_registered(self, plugin) -> None: ...
 
     def pytest_runtest_logstart(
         self, nodeid: str, location: Tuple[str, Optional[int], str]
@@ -301,11 +297,9 @@ class RichTerminalReporter:
 
     def pytest_keyboard_interrupt(
         self, excinfo: pytest.ExceptionInfo[BaseException]
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    def pytest_unconfigure(self) -> None:
-        ...
+    def pytest_unconfigure(self) -> None: ...
 
     @property
     def verbose(self) -> bool:

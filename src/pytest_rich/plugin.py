@@ -1,6 +1,7 @@
 """
 Proof of concept for pytest + rich integration.
 """
+
 import sys
 
 import pytest

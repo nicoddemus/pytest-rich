@@ -26,18 +26,15 @@ def test_teardown_error(teardown_error_fixture):
 
 
 @pytest.mark.skip
-def test_skip_no_reason():
-    ...
+def test_skip_no_reason(): ...
 
 
 @pytest.mark.skip(reason="skipped")
-def test_skip():
-    ...
+def test_skip(): ...
 
 
 @pytest.mark.skip("skipped")
-def test_skip_no_keyword():
-    ...
+def test_skip_no_keyword(): ...
 
 
 def test_inline_skip():
