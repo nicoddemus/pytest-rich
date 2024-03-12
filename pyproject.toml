@@ -8,6 +8,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 
+[tool.isort]
+profile = "black"
+force_single_line = "true"
+
 [tool.pytest.ini_options]
 addopts = "--ignore tests/example"
 pytester_example_dir = "tests/example"

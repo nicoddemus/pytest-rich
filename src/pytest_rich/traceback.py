@@ -21,8 +21,8 @@ from rich._loop import loop_last
 from rich.console import Console
 from rich.console import ConsoleOptions
 from rich.console import ConsoleRenderable
-from rich.console import group
 from rich.console import RenderResult
+from rich.console import group
 from rich.highlighter import ReprHighlighter
 from rich.panel import Panel
 from rich.rule import Rule
