@@ -1,6 +1,5 @@
 import re
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Tuple
 

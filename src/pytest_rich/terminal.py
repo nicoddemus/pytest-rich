@@ -2,24 +2,16 @@ import sys
 import warnings
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
-from typing import Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import attr
 import pytest
-from _pytest._code.code import ExceptionChainRepr
-from _pytest._code.code import ExceptionRepr
+from _pytest._code.code import ExceptionChainRepr, ExceptionRepr
 from rich.console import Console
 from rich.live import Live
 from rich.padding import Padding
 from rich.panel import Panel
-from rich.progress import Progress
-from rich.progress import SpinnerColumn
-from rich.progress import TaskID
+from rich.progress import Progress, SpinnerColumn, TaskID
 from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
