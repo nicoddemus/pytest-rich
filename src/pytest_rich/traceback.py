@@ -1,34 +1,21 @@
 import ast
 import sys
-from typing import Dict
-from typing import Optional
-from typing import Sequence
+from typing import Dict, Optional, Sequence
 
 import attr
-from _pytest._code.code import ExceptionChainRepr
-from _pytest._code.code import ReprEntry
-from _pytest._code.code import ReprFileLocation
-from _pytest._code.code import ReprFuncArgs
-from pygments.token import Comment
-from pygments.token import Keyword
-from pygments.token import Name
-from pygments.token import Number
-from pygments.token import Operator
-from pygments.token import String
+from _pytest._code.code import (ExceptionChainRepr, ReprEntry,
+                                ReprFileLocation, ReprFuncArgs)
+from pygments.token import Comment, Keyword, Name, Number, Operator, String
 from pygments.token import Text as TextToken
 from pygments.token import Token
 from rich._loop import loop_last
-from rich.console import Console
-from rich.console import ConsoleOptions
-from rich.console import ConsoleRenderable
-from rich.console import RenderResult
-from rich.console import group
+from rich.console import (Console, ConsoleOptions, ConsoleRenderable,
+                          RenderResult, group)
 from rich.highlighter import ReprHighlighter
 from rich.panel import Panel
 from rich.rule import Rule
 from rich.style import Style
-from rich.syntax import Syntax
-from rich.syntax import SyntaxTheme
+from rich.syntax import Syntax, SyntaxTheme
 from rich.text import Text
 from rich.theme import Theme
 from rich.traceback import PathHighlighter

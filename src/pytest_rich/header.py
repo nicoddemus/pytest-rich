@@ -1,6 +1,5 @@
 import sys
-from typing import Iterable
-from typing import Union
+from typing import Iterable, Union
 
 import pytest
 from _pytest.main import Session
