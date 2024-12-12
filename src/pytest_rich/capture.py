@@ -2,7 +2,6 @@ import re
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
-from typing import Tuple
 
 from rich.console import Console
 
@@ -28,7 +27,7 @@ def save_terminal_output(console: Console, arg: str) -> None:
     save_func(f"{filename}.{filetype}")
 
 
-def _get_filename_from_arg(arg: str) -> Tuple[str, str]:
+def _get_filename_from_arg(arg: str) -> tuple[str, str]:
     """
     Get filename from command line argument.
 
