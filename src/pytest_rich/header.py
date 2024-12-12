@@ -1,5 +1,5 @@
 import sys
-from typing import Iterable
+from collections.abc import Iterable
 from typing import Union
 
 import pytest

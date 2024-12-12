@@ -1,7 +1,6 @@
 import ast
-from typing import Dict
+from collections.abc import Sequence
 from typing import Optional
-from typing import Sequence
 
 import attr
 from _pytest._code.code import ExceptionChainRepr
@@ -114,7 +113,7 @@ class RichExceptionChainRepr:
         path_highlighter = PathHighlighter()
         repr_highlighter = ReprHighlighter()
         theme = self.get_theme()
-        code_cache: Dict[str, str] = {}
+        code_cache: dict[str, str] = {}
 
         def read_code(filename: str) -> str:
             """
@@ -128,9 +127,7 @@ class RichExceptionChainRepr:
             """
             code = code_cache.get(filename)
             if not code:
-                with open(
-                    filename, "rt", encoding="utf-8", errors="replace"
-                ) as code_file:
+                with open(filename, encoding="utf-8", errors="replace") as code_file:
                     code = code_file.read()
                 code_cache[filename] = code
             return code

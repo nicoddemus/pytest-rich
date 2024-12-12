@@ -1,12 +1,9 @@
 import warnings
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Dict
-from typing import List
 from typing import Literal
 from typing import Optional
-from typing import Sequence
-from typing import Tuple
 from typing import Union
 
 import attr
@@ -43,11 +40,11 @@ class RichTerminalReporter:
         self.runtest_progress: Optional[Progress] = None
         self.total_items_collected = 0
         self.total_items_completed = 0
-        self.items_per_file: Dict[Path, List[pytest.Item]] = {}
-        self.status_per_item: Dict[str, RichTerminalReporter.Status] = {}
-        self.items: Dict[str, pytest.Item] = {}
-        self.runtest_tasks_per_file: Dict[Path, TaskID] = {}
-        self.categorized_reports: Dict[str, List[pytest.TestReport]] = defaultdict(list)
+        self.items_per_file: dict[Path, list[pytest.Item]] = {}
+        self.status_per_item: dict[str, RichTerminalReporter.Status] = {}
+        self.items: dict[str, pytest.Item] = {}
+        self.runtest_tasks_per_file: dict[Path, TaskID] = {}
+        self.categorized_reports: dict[str, list[pytest.TestReport]] = defaultdict(list)
         self.summary: Optional[Live] = None
         self.total_duration: float = 0
         self.console.record = self.config.getoption("rich_capture") is not None
@@ -109,7 +106,7 @@ class RichTerminalReporter:
     def pytest_plugin_registered(self, plugin) -> None: ...
 
     def pytest_runtest_logstart(
-        self, nodeid: str, location: Tuple[str, Optional[int], str]
+        self, nodeid: str, location: tuple[str, Optional[int], str]
     ) -> None:
         if self.runtest_progress is None:
             self.runtest_progress = Progress(SpinnerColumn(), "{task.description}")
