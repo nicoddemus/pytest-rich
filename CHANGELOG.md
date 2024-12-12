@@ -17,14 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 ``` -->
 
-## [Unreleased]
+## [0.2.0]
+
+*2024-12-12*
 
 ### Added
 
 - Confirmed Python 3.13 support. ([#91])
 - Confirmed Python 3.12 support. ([#84])
-- Added `CHANGELOG.md` file. ([#40])
 - Confirmed Python 3.11 support. ([#39])
+- Added `CHANGELOG.md` file. ([#40])
 - Added test summary to the end of the test run. ([#31])
 - Added support for `--no-header` and `--no-summary` command line options. ([#64])
 - Added support for capturing terminal output using Rich's `Console` class, with command line option `--rich-capture`. ([#65])
@@ -36,9 +38,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dropped Python 3.8 support. ([#91])
 
 
-## [0.1.1] - 2022-03-03
+## [0.1.1]
 
-## [0.1.0] - 2022-03-02
+*2022-03-03*
+
+## [0.1.0]
+
+*2022-03-02*
 
 Initial release!
 
