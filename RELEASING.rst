@@ -32,6 +32,6 @@ To publish a new release ``X.Y.Z``, the steps are as follows:
 
    .. code-block:: console
 
-        gh workflow run deploy.yml -R pytest-dev/pytest-rich --ref release-VERSION --field version=VERSION
+        gh workflow run deploy.yml -R nicoddemus/pytest-rich --ref release-VERSION --field version=VERSION
 
    The PR will be automatically merged.
