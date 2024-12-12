@@ -1,9 +1,9 @@
-import sys
 import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 from typing import List
+from typing import Literal
 from typing import Optional
 from typing import Sequence
 from typing import Tuple
@@ -27,11 +27,6 @@ from rich.text import Text
 from pytest_rich.capture import save_terminal_output
 from pytest_rich.header import generate_header_panel
 from pytest_rich.traceback import RichExceptionChainRepr
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
 
 HORIZONTAL_PAD = (0, 1, 0, 1)
 

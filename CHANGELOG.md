@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Confirmed Python 3.13 support. ([#91])
 - Confirmed Python 3.12 support. ([#84])
 - Added `CHANGELOG.md` file. ([#40])
 - Confirmed Python 3.11 support. ([#39])
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Dropped Python 3.7 support. ([#84])
+- Dropped Python 3.8 support. ([#91])
 
 
 ## [0.1.1] - 2022-03-03
@@ -55,3 +57,4 @@ Initial release!
 [#65]: https://github.com/nicoddemus/pytest-rich/pull/65
 [#66]: https://github.com/nicoddemus/pytest-rich/pull/66
 [#84]: https://github.com/nicoddemus/pytest-rich/pull/84
+[#91]: https://github.com/nicoddemus/pytest-rich/pull/91

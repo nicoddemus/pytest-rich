@@ -1,0 +1,51 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '1.2.3'
+
+jobs:
+
+  package:
+    runs-on: ubuntu-latest
+    env:
+      SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.version }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and Check Package
+      uses: hynek/build-and-inspect-python-package@v2.10
+
+  deploy:
+    needs: package
+    runs-on: ubuntu-latest
+    environment: deploy
+    permissions:
+      id-token: write  # For PyPI trusted publishers.
+      contents: write  # For tag.
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Package
+      uses: actions/download-artifact@v4
+      with:
+        name: Packages
+        path: dist
+
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.12.2
+      with:
+        attestations: true
+
+    - name: GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create v${{ github.event.inputs.version }} --target=${{ github.ref_name }} --title v${{ github.event.inputs.version }}
+        gh pr merge ${{ github.ref_name }} --merge

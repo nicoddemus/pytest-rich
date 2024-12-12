@@ -1,5 +1,4 @@
 import ast
-import sys
 from typing import Dict
 from typing import Optional
 from typing import Sequence
@@ -152,14 +151,9 @@ class RichExceptionChainRepr:
             tree = ast.parse(code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
-                    # TODO: Remove this if statement once 3.7 support is dropped
-                    if sys.version_info < (3, 8):
-                        if node.lineno <= lineno < node.lineno + node.body[0].lineno:
+                    if node.end_lineno is not None:
+                        if node.lineno <= lineno <= node.end_lineno:
                             return node.name
-                    else:
-                        if node.end_lineno is not None:
-                            if node.lineno <= lineno <= node.end_lineno:
-                                return node.name
             return "???"
 
         def get_args(reprfuncargs: ReprFuncArgs) -> Text:
