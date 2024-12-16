@@ -6,6 +6,64 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "pytest-rich"
+authors = [
+    { name = "Bruno Oliveira", email = "nicoddemus@gmail.com"},
+    { name = "Melanie Arbor", email = "marbor@oreilly.com" },
+    { name = "klove", email = "klove@oreilly.com"}
+]
+maintainers = [
+    { name = "Bruno Oliveira", email = "nicoddemus@gmail.com"},
+    { name = "Melanie Arbor", email = "marbor@oreilly.com" },
+    { name = "klove", email = "klove@oreilly.com"}
+]
+version = "0.1.0"
+description = "Leverage `rich` for richer pytest session output."
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+
+dependencies = [
+    "pytest>=7.0.0",
+    "rich",
+    "typing-extensions",
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "freezegun",
+    "mypy",
+    "reorder-python-imports",
+    "tox",
+    "types-attrs",
+]
+
+[project.urls]
+Repository = "https://github.com/nicoddemus/pytest-rich"
+
+[entrypoints."pytest11"]
+rich = "pytest_rich.plugin"
+
 [tool.setuptools_scm]
 
 [tool.pytest.ini_options]
