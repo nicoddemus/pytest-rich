@@ -17,7 +17,7 @@ IMPORTANT: Proof-of-concept
 
 This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it.
 
-The plugin currently outputs this:
+Using `pytest --rich` the plugin currently outputs this:
 
 .. image:: assets/screenshot.png
     :align: center
