@@ -12,17 +12,20 @@ Leverage `rich`_ for richer test session output.
     :target: https://pypi.org/project/pytest-rich
     :alt: Python versions
 
-IMPORTANT: Proof-of-concept
----------------------------
-
-This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it.
+Usage
+=====
 
 With ``pytest --rich`` the plugin currently outputs this:
 
 .. image:: assets/screenshot.png
     :align: center
 
-There's definitely room for improvement, and the new maintainers are free to improve on that or even change it completely.
+You might also take a look at `pytest-modern <https://github.com/zen-xu/pytest-modern>`__ instead.
+
+IMPORTANT: Proof-of-concept
+---------------------------
+
+This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it. 
 
 I intend to *initially* add people as maintainers to this repository, and after a while eventually transfer it to another account.
 
