@@ -25,7 +25,7 @@ You might also take a look at `pytest-modern <https://github.com/zen-xu/pytest-m
 IMPORTANT: Proof-of-concept
 ---------------------------
 
-This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it. 
+This plugin is mostly a proof of concept and is **looking for a maintainer** which wants to adopt it.
 
 I intend to *initially* add people as maintainers to this repository, and after a while eventually transfer it to another account.
 
