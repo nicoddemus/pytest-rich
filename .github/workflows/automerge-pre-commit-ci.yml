@@ -7,22 +7,22 @@ on:
 jobs:
   enable-auto-merge:
     runs-on: ubuntu-latest
-        
+
     if: github.event.pull_request.user.login == 'pre-commit-ci'
-    
+
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
       - name: Enable auto-merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          
+
           echo "Auto-approving PR #${PR_NUMBER}"
           gh pr review $PR_NUMBER --approve --body "Auto-approved for pre-commit-ci"
-          
+
           echo "Enabling auto-merge for PR #${PR_NUMBER}"
           gh pr merge $PR_NUMBER --auto --merge
