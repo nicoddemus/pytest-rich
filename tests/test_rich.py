@@ -17,11 +17,9 @@ def test_outcomes(pytester):
 
 
 def test_collect_error(pytester):
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
     raise Exception("collect error")
-    """
-    )
+    """)
 
     without_rich = pytester.runpytest()
     with_rich = pytester.runpytest("--rich")
