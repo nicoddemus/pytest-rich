@@ -199,10 +199,10 @@ class RichExceptionChainRepr:
             )
             yield text
 
-            assert entry.reprfuncargs is not None
-            args = get_args(entry.reprfuncargs)
-            if args:
-                yield args
+            if entry.reprfuncargs is not None:
+                args = get_args(entry.reprfuncargs)
+                if args:
+                    yield args
 
             code = read_code(filename)
             syntax = Syntax(
