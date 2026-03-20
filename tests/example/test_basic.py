@@ -92,3 +92,10 @@ def test_nested_failure():
 
 def test_warning():
     warnings.warn("warning")
+
+def test_deep_nested_without_assertion_error():
+    def level3():
+        raise ValueError("Oops deeply nested")
+    def level2():
+        level3()
+    level2()

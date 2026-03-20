@@ -4,7 +4,7 @@ def test_outcomes(pytester):
     outcomes = {
         "passed": 3,
         "skipped": 4,
-        "failed": 2,
+        "failed": 3,
         "errors": 2,
         "xpassed": 1,
         "xfailed": 3,
