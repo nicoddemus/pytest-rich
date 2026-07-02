@@ -22,6 +22,38 @@ def test_collect_error_shown_with_no_summary(rich_pytester):
     result.stdout.fnmatch_lines(["*ERROR collecting*"])
 
 
+def test_captured_output_shown_on_failure(rich_pytester):
+    """Captured stdout/stderr must be shown for failed tests, like stock pytest (#77)."""
+    rich_pytester.makepyfile("""
+        import sys
+
+        def test_fail_with_output():
+            print("hello from stdout")
+            print("hello from stderr", file=sys.stderr)
+            assert False
+    """)
+    result = rich_pytester.runpytest()
+    assert result.ret == 1
+    result.stdout.fnmatch_lines([
+        "*Captured stdout call*",
+        "*hello from stdout*",
+        "*Captured stderr call*",
+        "*hello from stderr*",
+    ])
+
+
+def test_show_capture_no_hides_captured_output(rich_pytester):
+    """--show-capture=no must suppress captured output sections (#13)."""
+    rich_pytester.makepyfile("""
+        def test_fail_with_output():
+            print("hello from stdout")
+            assert False
+    """)
+    result = rich_pytester.runpytest("--show-capture=no")
+    assert result.ret == 1
+    result.stdout.no_fnmatch_line("*Captured stdout call*")
+
+
 class TestSetupTeardownErrors:
     # Setup errors fall into ``else: status = "running"`` at terminal.py:201
     # and never reach ``categorized_reports``. Teardown errors are ignored
