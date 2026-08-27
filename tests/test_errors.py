@@ -42,6 +42,22 @@ def test_captured_output_shown_on_failure(rich_pytester):
     ])
 
 
+def test_show_capture_stdout_hides_stderr(rich_pytester):
+    """--show-capture=<stream> must show only that stream's sections (#13)."""
+    rich_pytester.makepyfile("""
+        import sys
+
+        def test_fail_with_output():
+            print("hello from stdout")
+            print("hello from stderr", file=sys.stderr)
+            assert False
+    """)
+    result = rich_pytester.runpytest("--show-capture=stdout")
+    assert result.ret == 1
+    result.stdout.fnmatch_lines(["*Captured stdout call*", "*hello from stdout*"])
+    result.stdout.no_fnmatch_line("*Captured stderr*")
+
+
 def test_show_capture_no_hides_captured_output(rich_pytester):
     """--show-capture=no must suppress captured output sections (#13)."""
     rich_pytester.makepyfile("""

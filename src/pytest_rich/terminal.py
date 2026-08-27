@@ -337,7 +337,7 @@ class RichTerminalReporter:
             if show_capture != "all" and show_capture not in section_name:
                 continue
             self.console.print(Rule(section_name, style="yellow"))
-            self.console.print(Text(content))
+            self.console.print(Text(content.removesuffix("\n")))
 
     def print_summary(self, error_messages):
         summary_table = Table.grid()

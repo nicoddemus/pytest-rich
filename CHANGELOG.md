@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added support for the built-in `--show-capture` command line option. ([#150])
+- Captured `stdout`/`stderr` is now shown for failed tests, like the built-in reporter. ([#150])
+
 ### Fixed
 
 - Fixed crash when tests use `skip`, `xfail` or `xpass`. ([#140])
@@ -79,3 +84,4 @@ Initial release!
 [#141]: https://github.com/Jamorim-esss/pytest-rich/pull/141
 [#144]: https://github.com/Jamorim-esss/pytest-rich/pull/144
 [#149]: https://github.com/Jamorim-esss/pytest-rich/pull/149
+[#150]: https://github.com/Jamorim-esss/pytest-rich/pull/150
