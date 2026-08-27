@@ -68,6 +68,7 @@ class RichTerminalReporter:
     def pytest_collection(self) -> None:
         self.collect_progress = Progress(
             "[progress.description]{task.description}",
+            console=self.console,
         )
         self.collect_task = self.collect_progress.add_task("[cyan][bold]Collecting")
         self.collect_progress.start()
@@ -140,7 +141,9 @@ class RichTerminalReporter:
         self, nodeid: str, location: tuple[str, Optional[int], str]
     ) -> None:
         if self.runtest_progress is None:
-            self.runtest_progress = Progress(SpinnerColumn(), "{task.description}")
+            self.runtest_progress = Progress(
+                SpinnerColumn(), "{task.description}", console=self.console
+            )
             self.runtest_progress.start()
 
             for fn in self.items_per_file:
