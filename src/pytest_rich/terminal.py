@@ -129,7 +129,6 @@ class RichTerminalReporter:
                 continue
             self.status_per_item.pop(item.nodeid, None)
             self.nodeid_per_location.pop(item.location, None)
-            self.total_items_collected -= 1
             per_file = self.items_per_file[item.path]
             per_file.remove(item)
             if not per_file:
@@ -155,7 +154,7 @@ class RichTerminalReporter:
                 )
                 self.runtest_tasks_per_file[fn] = task
             self.overall_progress_task = self.runtest_progress.add_task(
-                "Progress", total=self.total_items_collected
+                "Progress", total=len(self.items)
             )
 
         self._update_task(nodeid)
@@ -262,7 +261,7 @@ class RichTerminalReporter:
 
     def pytest_runtest_logfinish(self) -> None:
         self.total_items_completed += 1
-        percent = (self.total_items_completed * 100) // self.total_items_collected
+        percent = (self.total_items_completed * 100) // len(self.items)
         if self.runtest_progress is not None:
             self.runtest_progress.update(
                 self.overall_progress_task,
