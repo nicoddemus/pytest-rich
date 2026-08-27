@@ -53,6 +53,7 @@ class RichTerminalReporter:
         self.items_per_file: dict[Path, list[pytest.Item]] = {}
         self.status_per_item: dict[str, RichTerminalReporter.Status] = {}
         self.items: dict[str, pytest.Item] = {}
+        self.nodeid_per_location: dict[tuple[str, Optional[int], str], str] = {}
         self.runtest_tasks_per_file: dict[Path, TaskID] = {}
         self.categorized_reports: dict[str, list[pytest.TestReport]] = defaultdict(list)
         self.summary: Optional[Live] = None
@@ -67,6 +68,7 @@ class RichTerminalReporter:
     def pytest_collection(self) -> None:
         self.collect_progress = Progress(
             "[progress.description]{task.description}",
+            console=self.console,
         )
         self.collect_task = self.collect_progress.add_task("[cyan][bold]Collecting")
         self.collect_progress.start()
@@ -80,6 +82,7 @@ class RichTerminalReporter:
                 self.items_per_file.setdefault(item.path, []).append(item)
                 self.status_per_item[item.nodeid] = "collected"
                 self.items[item.nodeid] = item
+                self.nodeid_per_location[item.location] = item.nodeid
             self.total_items_collected += len(items)
             if self.collect_progress is not None:
                 self.collect_progress.update(
@@ -118,7 +121,19 @@ class RichTerminalReporter:
         nodeid: str,
     ) -> None: ...
 
-    def pytest_deselected(self, items: Sequence[pytest.Item]) -> None: ...
+    def pytest_deselected(self, items: Sequence[pytest.Item]) -> None:
+        # Deselected items never run, so drop them from the bookkeeping or the
+        # per-file progress would never reach 100%.
+        for item in items:
+            if self.items.pop(item.nodeid, None) is None:
+                continue
+            self.status_per_item.pop(item.nodeid, None)
+            self.nodeid_per_location.pop(item.location, None)
+            self.total_items_collected -= 1
+            per_file = self.items_per_file[item.path]
+            per_file.remove(item)
+            if not per_file:
+                del self.items_per_file[item.path]
 
     def pytest_plugin_registered(self, plugin) -> None: ...
 
@@ -126,13 +141,15 @@ class RichTerminalReporter:
         self, nodeid: str, location: tuple[str, Optional[int], str]
     ) -> None:
         if self.runtest_progress is None:
-            self.runtest_progress = Progress(SpinnerColumn(), "{task.description}")
+            self.runtest_progress = Progress(
+                SpinnerColumn(), "{task.description}", console=self.console
+            )
             self.runtest_progress.start()
 
             for fn in self.items_per_file:
                 total_items = self.items_per_file[fn]
                 task = self.runtest_progress.add_task(
-                    str(fn.relative_to(self.config.rootpath)),
+                    self._file_label(fn),
                     total=len(total_items),
                     visible=False,
                 )
@@ -162,12 +179,24 @@ class RichTerminalReporter:
             case unreachable:
                 assert_never(unreachable)
 
+    def _file_label(self, fn: Path) -> str:
+        # ``relative_to`` raises ValueError for tests collected from outside
+        # the rootdir (e.g. ``pytest ../sibling/tests``).
+        try:
+            return str(fn.relative_to(self.config.rootpath))
+        except ValueError:
+            return str(fn)
+
     def _update_task(self, nodeid: str):
-        base_fn = nodeid.split("::")[0]
-        fn = self.config.rootpath / base_fn
+        current_item = self.items.get(nodeid)
+        if current_item is None:
+            # A plugin's report hook rewrote ``nodeid`` into something we never
+            # collected (e.g. a display-only string). Nothing to update.
+            return
+        fn = current_item.path
         task = self.runtest_tasks_per_file[fn]
-        current_item = self.items[nodeid]
-        items = self.items_per_file[current_item.path]
+        base_fn = self._file_label(fn)
+        items = self.items_per_file[fn]
         chars = []
         statuses = []
         for item in items:
@@ -222,8 +251,14 @@ class RichTerminalReporter:
                 category = "failed"
             self._preserve_report(report, category)
         if status is not None:
-            self.status_per_item[report.nodeid] = status
-            self._update_task(report.nodeid)
+            # A plugin's makereport hook may have rewritten ``report.nodeid``
+            # into a display-only string (#74); recover the collected nodeid
+            # through ``report.location``, which plugins don't mutate.
+            nodeid = report.nodeid
+            if nodeid not in self.items:
+                nodeid = self.nodeid_per_location.get(report.location, nodeid)
+            self.status_per_item[nodeid] = status
+            self._update_task(nodeid)
 
     def pytest_runtest_logfinish(self) -> None:
         self.total_items_completed += 1
