@@ -47,3 +47,5 @@ def test_progress_completes_with_deselected_tests(rich_pytester):
     result.stdout.fnmatch_lines(
         ["*100%*test_progress_completes_with_deselected_tests.py*"]
     )
+    # Deselecting must not shrink the reported collection count.
+    result.stdout.fnmatch_lines(["*Collected 2 items*"])

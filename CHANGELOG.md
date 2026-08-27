@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 ``` -->
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed crash when tests use `skip`, `xfail` or `xpass`. ([#140])
+- Fixed traceback crashes on nested function failures. ([#141])
+- Collection errors are now shown instead of being silently hidden. ([#144])
+- Fixed `INTERNALERROR` when another plugin's `pytest_runtest_makereport` hookwrapper rewrites `report.nodeid`. ([#149])
+- Fixed per-file progress never reaching 100% when tests are deselected (e.g. `pytest -k`). ([#149])
+
+
 ## [0.2.0]
 
 *2024-12-12*
@@ -64,3 +75,7 @@ Initial release!
 [#66]: https://github.com/nicoddemus/pytest-rich/pull/66
 [#84]: https://github.com/nicoddemus/pytest-rich/pull/84
 [#91]: https://github.com/nicoddemus/pytest-rich/pull/91
+[#140]: https://github.com/Jamorim-esss/pytest-rich/pull/140
+[#141]: https://github.com/Jamorim-esss/pytest-rich/pull/141
+[#144]: https://github.com/Jamorim-esss/pytest-rich/pull/144
+[#149]: https://github.com/Jamorim-esss/pytest-rich/pull/149
