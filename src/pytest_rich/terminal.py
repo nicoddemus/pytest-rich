@@ -311,6 +311,7 @@ class RichTerminalReporter:
                             msg,
                         )
                     )
+                self._print_captured_sections(report)
 
             if self.verbosity_level >= 0 and self.total_items_completed > 0:
                 self.print_summary(error_messages)
@@ -326,6 +327,17 @@ class RichTerminalReporter:
 
         if self.console.record is True:
             save_terminal_output(self.console, self.config.getoption("rich_capture"))
+
+    def _print_captured_sections(self, report: pytest.TestReport) -> None:
+        # Same filtering as pytest's built-in reporter for --show-capture.
+        show_capture = self.config.option.showcapture
+        if show_capture == "no":
+            return
+        for section_name, content in report.sections:
+            if show_capture != "all" and show_capture not in section_name:
+                continue
+            self.console.print(Rule(section_name, style="yellow"))
+            self.console.print(Text(content.removesuffix("\n")))
 
     def print_summary(self, error_messages):
         summary_table = Table.grid()
