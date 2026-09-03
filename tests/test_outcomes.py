@@ -18,7 +18,7 @@ def test_outcomes(pytester):
 
 
 def test_outcomes_rich(rich_pytester, assert_rich_outcomes):
-    """Rich panel currently omits ``errors`` — see TestSetupTeardownErrors."""
+    """The Rich panel must report the same outcomes as the stock reporter."""
     rich_pytester.copy_example("test_basic.py")
     result = rich_pytester.runpytest()
     assert_rich_outcomes(
@@ -26,7 +26,6 @@ def test_outcomes_rich(rich_pytester, assert_rich_outcomes):
     )
 
 
-@pytest.mark.xfail(strict=True, reason="Rich panel drops errors — terminal.py:201")
 def test_outcomes_rich_shows_errors(rich_pytester, assert_rich_outcomes):
     rich_pytester.copy_example("test_basic.py")
     result = rich_pytester.runpytest()

@@ -226,6 +226,11 @@ class RichTerminalReporter:
                     status = "skipped"
                     category = "skipped"
                 self._preserve_report(report, category)
+            elif report.failed:
+                status = "error"
+                # Not ``_preserve_report``: setup/teardown time was never part
+                # of ``total_duration``, and an error should not change that.
+                self.categorized_reports["errors"].append(report)
             else:
                 status = "running"
         elif report.when == "call":
@@ -249,6 +254,9 @@ class RichTerminalReporter:
                 status = "fail"
                 category = "failed"
             self._preserve_report(report, category)
+        elif report.when == "teardown" and report.failed:
+            status = "error"
+            self.categorized_reports["errors"].append(report)
         if status is not None:
             # A plugin's makereport hook may have rewritten ``report.nodeid``
             # into a display-only string (#74); recover the collected nodeid
@@ -276,16 +284,22 @@ class RichTerminalReporter:
             self.runtest_progress = None
             self.runtest_tasks_per_file.clear()
 
-        if self.collection_errors:
+        errors: list[tuple[str, Union[pytest.CollectReport, pytest.TestReport]]] = [
+            (f"ERROR collecting {r.nodeid}", r) for r in self.collection_errors
+        ]
+        errors += [
+            (f"ERROR at {r.when} of {r.nodeid}", r)
+            for r in self.categorized_reports["errors"]
+        ]
+        if errors:
             self.console.print(Rule("ERRORS", style="bold red"))
-            for report in self.collection_errors:
-                self.console.print(
-                    Text(f"ERROR collecting {report.nodeid}", style="bold red")
-                )
+            for title, report in errors:
+                self.console.print(Text(title, style="bold red"))
                 if hasattr(report.longrepr, "longrepr"):
                     self.console.print(Text(report.longrepr.longrepr, style="red"))
                 elif report.longrepr is not None:
                     self.console.print(Text(str(report.longrepr), style="red"))
+                self._print_captured_sections(report)
 
         if self.no_summary is False:
             error_messages = {}
@@ -328,7 +342,9 @@ class RichTerminalReporter:
         if self.console.record is True:
             save_terminal_output(self.console, self.config.getoption("rich_capture"))
 
-    def _print_captured_sections(self, report: pytest.TestReport) -> None:
+    def _print_captured_sections(
+        self, report: Union[pytest.CollectReport, pytest.TestReport]
+    ) -> None:
         # Same filtering as pytest's built-in reporter for --show-capture.
         show_capture = self.config.option.showcapture
         if show_capture == "no":
@@ -361,6 +377,7 @@ class RichTerminalReporter:
         style_dict = {
             "passed": "bold green",
             "failed": "bold red",
+            "errors": "bold red",
             "skipped": "bold yellow",
             "xfailed": "bold yellow",
             "xpassed": "bold yellow",
@@ -368,13 +385,18 @@ class RichTerminalReporter:
         for state, reports in self.categorized_reports.items():
             no_of_items = len(reports)
             if no_of_items > 0:
+                # An item can be counted twice (e.g. passed call + failed
+                # teardown), so a percentage would not add up: omit it for
+                # errors, like the ``Collection Errors`` row below.
+                percent = (
+                    ""
+                    if state == "errors"
+                    else f"({100 * no_of_items / self.total_items_completed:.1f}%)"
+                )
                 summary_table.add_row(
                     Padding(str(no_of_items), pad=HORIZONTAL_PAD),
                     Padding(state.title(), pad=HORIZONTAL_PAD),
-                    Padding(
-                        f"({100 * no_of_items / self.total_items_completed:.1f}%)",
-                        pad=HORIZONTAL_PAD,
-                    ),
+                    Padding(percent, pad=HORIZONTAL_PAD),
                     style=style_dict[state],
                 )
 
