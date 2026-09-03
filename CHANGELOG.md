@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.3.0]
+
+*2026-09-03*
+
 ### Added
 
 - Added support for the built-in `--show-capture` command line option. ([#150])
@@ -31,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Collection errors are now shown instead of being silently hidden. ([#144])
 - Fixed `INTERNALERROR` when another plugin's `pytest_runtest_makereport` hookwrapper rewrites `report.nodeid`. ([#149])
 - Fixed per-file progress never reaching 100% when tests are deselected (e.g. `pytest -k`). ([#149])
+- Setup and teardown errors are now shown instead of being silently dropped. ([#155])
 
 
 ## [0.2.0]
@@ -66,7 +72,9 @@ Initial release!
 
 <!-- Releases links -->
 
-[unreleased]: https://github.com/nicoddemus/pytest-rich/compare/v0.1.1...HEAD
+[unreleased]: https://github.com/Jamorim-esss/pytest-rich/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Jamorim-esss/pytest-rich/releases/tag/v0.3.0
+[0.2.0]: https://github.com/Jamorim-esss/pytest-rich/releases/tag/v0.2.0
 [0.1.1]: https://github.com/nicoddemus/pytest-rich/releases/tag/v0.1.1
 [0.1.0]: https://github.com/nicoddemus/pytest-rich/releases/tag/v0.1.0
 
@@ -85,3 +93,4 @@ Initial release!
 [#144]: https://github.com/Jamorim-esss/pytest-rich/pull/144
 [#149]: https://github.com/Jamorim-esss/pytest-rich/pull/149
 [#150]: https://github.com/Jamorim-esss/pytest-rich/pull/150
+[#155]: https://github.com/Jamorim-esss/pytest-rich/pull/155
